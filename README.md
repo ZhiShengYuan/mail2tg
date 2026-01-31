@@ -1,6 +1,28 @@
 # Mail-to-Telegram
 
-A production-ready Golang system that fetches emails from Gmail and IMAP providers (like QQmail) and delivers them to Telegram with HTML rendering and reply functionality.
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Go Version](https://img.shields.io/badge/go-1.21+-00ADD8.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+A production-ready Golang system that fetches emails from Gmail and IMAP providers (like QQmail) and delivers them to Telegram with AI-powered summaries, HTML rendering, and reply functionality.
+
+**Latest**: v2.0.0 - Single JSON config, auto-migrations, LLM summarization | [Changelog](CHANGELOG.md) | [Upgrading Guide](UPGRADING.md)
+
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration-files)
+- [Telegram Bot Commands](#telegram-bot-commands)
+- [LLM Summarization](#llm-summarization)
+- [Email Notifications](#email-notifications)
+- [Security](#security)
+- [Documentation](#documentation)
+- [Troubleshooting](#troubleshooting)
+- [Development](#development)
+- [License](#license)
 
 ## Features
 
@@ -341,8 +363,24 @@ For issues and questions:
 - GitHub Issues: https://github.com/kexi/mail-to-tg/issues
 - Documentation: This README
 
+## Documentation
+
+### Getting Started
+- **[Setup Guide](SETUP.md)** - Detailed installation and configuration
+- **[Upgrading Guide](UPGRADING.md)** - Upgrade from v1.x to v2.0
+- **[Changelog](CHANGELOG.md)** - Version history and changes
+
+### Features
+- **[LLM Integration](docs/LLM_INTEGRATION.md)** - AI email summarization guide
+- **[Configuration](configs/README.md)** - Config file documentation
+
+### Quick Links
+- [GitHub Repository](https://github.com/ZhiShengYuan/mail2tg)
+- [Issues & Bug Reports](https://github.com/ZhiShengYuan/mail2tg/issues)
+
 ## Roadmap
 
+### Planned Features
 - [ ] Email search functionality
 - [ ] Multiple recipients for forwarding
 - [ ] Email filtering rules
@@ -351,3 +389,13 @@ For issues and questions:
 - [ ] Email templates for replies
 - [ ] Multi-language support
 - [ ] Mobile app integration
+- [ ] Per-user LLM settings
+- [ ] Smart email categorization
+
+### Recently Added (v2.0)
+- [x] Single JSON configuration
+- [x] Automatic database migrations
+- [x] LLM-powered email summarization
+- [x] Structured data extraction (codes, amounts, dates)
+- [x] Redis caching for LLM responses
+- [x] Multi-provider LLM support

@@ -6,6 +6,8 @@ A production-ready Golang system that fetches emails from Gmail and IMAP provide
 
 - **Multi-Provider Support**: Gmail (via OAuth2 + Pub/Sub push) and IMAP (QQmail, etc.)
 - **AI-Powered Email Summaries**: LLM-based summarization with structured data extraction (verification codes, amounts, dates)
+- **Auto-Migration**: Database tables created automatically on startup
+- **JSON Configuration**: Simple JSON-based secrets management (no .env files)
 - **Telegram Integration**: Real-time notifications with inline buttons
 - **HTML Email Viewing**: Secure web interface with sanitized HTML rendering
 - **Reply Functionality**: Reply to emails directly from Telegram via SMTP
@@ -61,8 +63,8 @@ export DB_ROOT_PASSWORD=your_root_password
 export DB_PASSWORD=your_mail_user_password
 make create-db
 
-# Run migrations
-make migrate
+# Note: Migrations run automatically on service startup
+# No manual migration step needed!
 ```
 
 ### 3. Configuration
@@ -71,18 +73,21 @@ make migrate
 # Generate encryption key
 make gen-key
 
-# Copy and edit configuration
-cp configs/.env.example .env
-nano .env
+# Copy and edit secrets configuration
+cp configs/secrets.json.example configs/secrets.json
+nano configs/secrets.json
 ```
 
-Fill in:
-- `DB_PASSWORD`: MariaDB password
-- `REDIS_PASSWORD`: Redis password (if set)
-- `TELEGRAM_BOT_TOKEN`: From @BotFather
-- `ENCRYPTION_KEY`: From `make gen-key`
-- `GMAIL_PROJECT_ID`: GCP project ID (if using Gmail)
-- `LLM_API_KEY`: OpenAI API key for email summarization (optional)
+Fill in `secrets.json`:
+- `database.password`: MariaDB password
+- `redis.password`: Redis password (if set)
+- `telegram.bot_token`: From @BotFather
+- `security.encryption_key`: From `make gen-key`
+- `security.jwt_secret`: Random string
+- `gmail.project_id`: GCP project ID (if using Gmail)
+- `llm.api_key`: OpenAI API key for email summarization (optional)
+
+Application settings are in `config.yaml` (non-sensitive), secrets in `secrets.json` (sensitive).
 
 ### 4. Run Locally (Development)
 
@@ -209,9 +214,11 @@ Set `LLM_ENABLED=false` in config to disable summarization and use preview mode.
 
 ## Configuration Files
 
-- `/etc/mail-to-tg/config.yaml` - Main configuration
-- `/etc/mail-to-tg/.env` - Environment variables (secrets)
+- `/etc/mail-to-tg/config.yaml` - Application settings (non-sensitive)
+- `/etc/mail-to-tg/secrets.json` - Secrets (API keys, passwords)
 - `/etc/mail-to-tg/credentials.json` - Gmail OAuth credentials
+
+**Note**: Configuration uses JSON for secrets instead of environment variables. This makes it easier to manage and validate configuration.
 
 ## Storage
 

@@ -36,20 +36,14 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
-### 2. Run Migrations
+### 2. Database Migrations
 
-```bash
-cd /home/kexi/mail-to-tg
+**Migrations are now automatic!** When you start the services, they will automatically:
+- Check which migrations have been applied
+- Run any pending migrations
+- Track migration history in `schema_migrations` table
 
-# Method 1: Using Makefile
-export DB_PASSWORD=your_secure_password
-make migrate
-
-# Method 2: Manual
-mysql -u mail_user -p mail_to_tg < migrations/001_initial_schema.sql
-mysql -u mail_user -p mail_to_tg < migrations/002_add_indexes.sql
-mysql -u mail_user -p mail_to_tg < migrations/003_add_ai_summary.sql
-```
+No manual migration step needed. Just configure and start the services.
 
 ## Configuration
 
@@ -61,39 +55,46 @@ openssl rand -base64 32
 # Save this output - you'll need it for .env file
 ```
 
-### 2. Create Environment File
+### 2. Create Secrets Configuration
+
+**NEW**: We now use JSON for secrets instead of environment variables!
 
 ```bash
-cp configs/.env.example .env
-nano .env
+cp configs/secrets.json.example configs/secrets.json
+nano configs/secrets.json
 ```
 
-Fill in the following:
+Fill in `configs/secrets.json`:
 
-```env
-# Database
-DB_PASSWORD=your_secure_password
-
-# Redis (if password is set)
-REDIS_PASSWORD=your_redis_password
-
-# Telegram Bot
-# Create bot via @BotFather on Telegram
-TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
-
-# Security
-# Use the key generated above
-ENCRYPTION_KEY=your_32_byte_base64_key_here
-JWT_SECRET=your_random_jwt_secret
-
-# Gmail API (optional, only if using Gmail)
-GMAIL_PROJECT_ID=your-gcp-project-id
-
-# LLM API (optional, for AI-powered email summaries)
-LLM_API_KEY=sk-your-openai-api-key
-LLM_BASE_URL=https://api.openai.com/v1
-LLM_MODEL=gpt-4o-mini
+```json
+{
+  "database": {
+    "password": "your_secure_password"
+  },
+  "redis": {
+    "password": "your_redis_password"
+  },
+  "telegram": {
+    "bot_token": "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+    "webhook_url": ""
+  },
+  "gmail": {
+    "project_id": "your-gcp-project-id",
+    "credentials_path": "/etc/mail-to-tg/credentials.json"
+  },
+  "security": {
+    "encryption_key": "your_32_byte_base64_key_here",
+    "jwt_secret": "your_random_jwt_secret"
+  },
+  "llm": {
+    "api_key": "sk-your-openai-api-key",
+    "base_url": "https://api.openai.com/v1",
+    "model": "gpt-4o-mini"
+  }
+}
 ```
+
+**Note**: The `secrets.json` file is automatically loaded from the same directory as `config.yaml`. Application settings remain in `config.yaml`, sensitive data goes in `secrets.json`.
 
 ### 3. Telegram Bot Setup
 
@@ -134,11 +135,13 @@ To enable AI-powered email summarization, configure an OpenAI-compatible API:
 
 1. Sign up at [OpenAI Platform](https://platform.openai.com/)
 2. Create an API key
-3. Add to `.env`:
-   ```env
-   LLM_API_KEY=sk-your-openai-api-key
-   LLM_BASE_URL=https://api.openai.com/v1
-   LLM_MODEL=gpt-4o-mini
+3. Add to `secrets.json`:
+   ```json
+   "llm": {
+     "api_key": "sk-your-openai-api-key",
+     "base_url": "https://api.openai.com/v1",
+     "model": "gpt-4o-mini"
+   }
    ```
 
 **Cost**: ~$0.27/day for 1000 emails (with gpt-4o-mini)
@@ -147,11 +150,13 @@ To enable AI-powered email summarization, configure an OpenAI-compatible API:
 
 1. Sign up at [OpenRouter](https://openrouter.ai/)
 2. Get API key
-3. Add to `.env`:
-   ```env
-   LLM_API_KEY=sk-or-your-openrouter-key
-   LLM_BASE_URL=https://openrouter.ai/api/v1
-   LLM_MODEL=anthropic/claude-3.5-sonnet
+3. Add to `secrets.json`:
+   ```json
+   "llm": {
+     "api_key": "sk-or-your-openrouter-key",
+     "base_url": "https://openrouter.ai/api/v1",
+     "model": "anthropic/claude-3.5-sonnet"
+   }
    ```
 
 #### Option 3: Local LLM (Privacy-Focused)
@@ -160,11 +165,13 @@ Using Ollama:
 
 1. Install Ollama: `curl -fsSL https://ollama.com/install.sh | sh`
 2. Download model: `ollama pull llama3.2`
-3. Add to `.env`:
-   ```env
-   LLM_API_KEY=not-needed
-   LLM_BASE_URL=http://localhost:11434/v1
-   LLM_MODEL=llama3.2
+3. Add to `secrets.json`:
+   ```json
+   "llm": {
+     "api_key": "not-needed",
+     "base_url": "http://localhost:11434/v1",
+     "model": "llama3.2"
+   }
    ```
 
 #### Disable LLM Summarization

@@ -15,10 +15,14 @@ bin/
 # Go workspace file
 go.work
 
-# Environment files
+# Environment files (deprecated, use secrets.json)
 .env
 *.env
 !.env.example
+
+# Secrets files
+secrets.json
+!secrets.json.example
 
 # Config files with secrets
 config.yaml

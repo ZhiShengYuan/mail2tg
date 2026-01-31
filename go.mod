@@ -11,7 +11,6 @@ require (
 	github.com/google/uuid v1.5.0
 	github.com/jhillyerd/enmime v1.1.0
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/rs/zerolog v1.31.0
 	github.com/sashabaranov/go-openai v1.41.2

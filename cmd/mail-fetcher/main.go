@@ -16,6 +16,7 @@ import (
 
 func main() {
 	configPath := flag.String("config", "/etc/mail-to-tg/config.yaml", "Path to config file")
+	migrationsDir := flag.String("migrations", "./migrations", "Path to migrations directory")
 	flag.Parse()
 
 	// Load configuration
@@ -39,6 +40,11 @@ func main() {
 	defer db.Close()
 
 	log.Info().Msg("Connected to MariaDB")
+
+	// Run database migrations automatically
+	if err := db.RunMigrations(*migrationsDir); err != nil {
+		log.Fatal().Err(err).Msg("Failed to run database migrations")
+	}
 
 	// Connect to Redis
 	redis, err := storage.NewRedis(&cfg.Redis)

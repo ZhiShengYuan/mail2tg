@@ -60,21 +60,31 @@ if [ ! -f "/etc/mail-to-tg/config.yaml" ]; then
     chmod 640 /etc/mail-to-tg/config.yaml
 fi
 
-# Copy .env.example if .env doesn't exist
-if [ ! -f "/etc/mail-to-tg/.env" ]; then
-    echo "Installing .env template..."
-    cp configs/.env.example /etc/mail-to-tg/.env
-    chown mail-to-tg:mail-to-tg /etc/mail-to-tg/.env
-    chmod 600 /etc/mail-to-tg/.env
-    echo "IMPORTANT: Edit /etc/mail-to-tg/.env with your credentials!"
+# Copy secrets.json.example if secrets.json doesn't exist
+if [ ! -f "/etc/mail-to-tg/secrets.json" ]; then
+    echo "Installing secrets.json template..."
+    cp configs/secrets.json.example /etc/mail-to-tg/secrets.json
+    chown mail-to-tg:mail-to-tg /etc/mail-to-tg/secrets.json
+    chmod 600 /etc/mail-to-tg/secrets.json
+    echo "IMPORTANT: Edit /etc/mail-to-tg/secrets.json with your credentials!"
 fi
+
+# Copy migrations directory
+echo "Installing migrations..."
+mkdir -p /opt/mail-to-tg/migrations
+cp migrations/*.sql /opt/mail-to-tg/migrations/
+chown -R mail-to-tg:mail-to-tg /opt/mail-to-tg/migrations
+chmod 755 /opt/mail-to-tg/migrations
+chmod 644 /opt/mail-to-tg/migrations/*.sql
 
 echo ""
 echo "Installation complete!"
 echo ""
 echo "Next steps:"
-echo "1. Edit /etc/mail-to-tg/.env with your credentials"
+echo "1. Edit /etc/mail-to-tg/secrets.json with your credentials"
 echo "2. Generate encryption key: openssl rand -base64 32"
-echo "3. Set up MariaDB database (run migrations)"
+echo "3. Set up MariaDB database (create database and user)"
 echo "4. Install systemd services: ./scripts/setup-services.sh"
 echo "5. Start services: systemctl start mail-fetcher telegram-service"
+echo ""
+echo "Note: Database migrations will run automatically when services start!"

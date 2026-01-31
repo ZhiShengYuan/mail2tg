@@ -71,16 +71,16 @@ setup-services:
 	@echo "Setting up systemd services..."
 	sudo ./scripts/setup-services.sh
 
-# Run database migrations
+# DEPRECATED: Migrations now run automatically on service startup
 migrate:
-	@echo "Running database migrations..."
-	@if [ -z "$(DB_PASSWORD)" ]; then \
-		echo "Error: DB_PASSWORD not set"; \
-		exit 1; \
-	fi
-	@mysql -u mail_user -p$(DB_PASSWORD) mail_to_tg < migrations/001_initial_schema.sql
-	@mysql -u mail_user -p$(DB_PASSWORD) mail_to_tg < migrations/002_add_indexes.sql
-	@echo "Migrations complete!"
+	@echo "⚠️  DEPRECATED: Migrations now run automatically when services start!"
+	@echo ""
+	@echo "Migrations are now handled automatically by the services."
+	@echo "Just start the services and they will apply pending migrations."
+	@echo ""
+	@echo "To start services:"
+	@echo "  make run-fetcher   (or)"
+	@echo "  make run-telegram"
 
 # Create database and user
 create-db:

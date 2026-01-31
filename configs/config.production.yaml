@@ -5,28 +5,28 @@ database:
   port: 3306
   name: mail_to_tg
   user: mail_user
-  password: ${DB_PASSWORD}
+  password: ""  # Set in secrets.json
   max_open_conns: 50
   max_idle_conns: 10
 
 redis:
   host: localhost
   port: 6379
-  password: ${REDIS_PASSWORD}
+  password: ""  # Set in secrets.json
   db: 0
 
 mail_fetcher:
   workers: 5
   imap_poll_interval: 60
   gmail:
-    project_id: ${GMAIL_PROJECT_ID}
+    project_id: ""  # Set in secrets.json
     pubsub_topic: gmail-notifications
     pubsub_subscription: gmail-sub
-    credentials_path: /etc/mail-to-tg/credentials.json
+    credentials_path: ""  # Set in secrets.json
 
 telegram:
-  bot_token: ${TELEGRAM_BOT_TOKEN}
-  webhook_url: ${TELEGRAM_WEBHOOK_URL}
+  bot_token: ""  # Set in secrets.json
+  webhook_url: ""  # Set in secrets.json
 
 web:
   host: 0.0.0.0
@@ -37,8 +37,8 @@ web:
   tls_key: /etc/mail-to-tg/ssl/key.pem
 
 security:
-  encryption_key: ${ENCRYPTION_KEY}
-  jwt_secret: ${JWT_SECRET}
+  encryption_key: ""  # Set in secrets.json
+  jwt_secret: ""  # Set in secrets.json
 
 storage:
   attachments_path: /var/lib/mail-to-tg/attachments
@@ -46,3 +46,13 @@ storage:
 logging:
   level: info
   format: json
+
+llm:
+  enabled: true
+  base_url: ""  # Set in secrets.json
+  api_key: ""  # Set in secrets.json
+  model: ""  # Set in secrets.json
+  timeout_seconds: 10
+  max_tokens: 300
+  fallback_on_error: true
+  cache_ttl_hours: 24

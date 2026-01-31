@@ -54,12 +54,12 @@ clean:
 # Run mail-fetcher locally
 run-fetcher: build
 	@echo "Running mail-fetcher..."
-	./$(BINARY_DIR)/$(MAIL_FETCHER) -config configs/config.yaml
+	./$(BINARY_DIR)/$(MAIL_FETCHER) -config configs/config.json
 
 # Run telegram-service locally
 run-telegram: build
 	@echo "Running telegram-service..."
-	./$(BINARY_DIR)/$(TELEGRAM_SERVICE) -config configs/config.yaml
+	./$(BINARY_DIR)/$(TELEGRAM_SERVICE) -config configs/config.json
 
 # Install to system (requires root)
 install: build

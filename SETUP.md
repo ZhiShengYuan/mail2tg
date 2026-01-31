@@ -55,46 +55,23 @@ openssl rand -base64 32
 # Save this output - you'll need it for .env file
 ```
 
-### 2. Create Secrets Configuration
+### 2. Create Configuration
 
-**NEW**: We now use JSON for secrets instead of environment variables!
+**Simple**: One JSON file for everything!
 
 ```bash
-cp configs/secrets.json.example configs/secrets.json
-nano configs/secrets.json
+cp configs/config.json.example configs/config.json
+nano configs/config.json
 ```
 
-Fill in `configs/secrets.json`:
+Fill in your credentials in `configs/config.json`. See example structure in the file.
 
-```json
-{
-  "database": {
-    "password": "your_secure_password"
-  },
-  "redis": {
-    "password": "your_redis_password"
-  },
-  "telegram": {
-    "bot_token": "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
-    "webhook_url": ""
-  },
-  "gmail": {
-    "project_id": "your-gcp-project-id",
-    "credentials_path": "/etc/mail-to-tg/credentials.json"
-  },
-  "security": {
-    "encryption_key": "your_32_byte_base64_key_here",
-    "jwt_secret": "your_random_jwt_secret"
-  },
-  "llm": {
-    "api_key": "sk-your-openai-api-key",
-    "base_url": "https://api.openai.com/v1",
-    "model": "gpt-4o-mini"
-  }
-}
-```
-
-**Note**: The `secrets.json` file is automatically loaded from the same directory as `config.yaml`. Application settings remain in `config.yaml`, sensitive data goes in `secrets.json`.
+Key fields to update:
+- `database.password` - Your MariaDB password
+- `telegram.bot_token` - From @BotFather
+- `security.encryption_key` - Generate with `openssl rand -base64 32`
+- `security.jwt_secret` - Any random string
+- `llm.api_key` - Your OpenAI/LLM API key (if using AI features)
 
 ### 3. Telegram Bot Setup
 
@@ -135,12 +112,17 @@ To enable AI-powered email summarization, configure an OpenAI-compatible API:
 
 1. Sign up at [OpenAI Platform](https://platform.openai.com/)
 2. Create an API key
-3. Add to `secrets.json`:
+3. Add to `config.json`:
    ```json
    "llm": {
+     "enabled": true,
      "api_key": "sk-your-openai-api-key",
      "base_url": "https://api.openai.com/v1",
-     "model": "gpt-4o-mini"
+     "model": "gpt-4o-mini",
+     "timeout_seconds": 10,
+     "max_tokens": 300,
+     "fallback_on_error": true,
+     "cache_ttl_hours": 24
    }
    ```
 
@@ -150,9 +132,10 @@ To enable AI-powered email summarization, configure an OpenAI-compatible API:
 
 1. Sign up at [OpenRouter](https://openrouter.ai/)
 2. Get API key
-3. Add to `secrets.json`:
+3. Add to `config.json`:
    ```json
    "llm": {
+     "enabled": true,
      "api_key": "sk-or-your-openrouter-key",
      "base_url": "https://openrouter.ai/api/v1",
      "model": "anthropic/claude-3.5-sonnet"
@@ -165,9 +148,10 @@ Using Ollama:
 
 1. Install Ollama: `curl -fsSL https://ollama.com/install.sh | sh`
 2. Download model: `ollama pull llama3.2`
-3. Add to `secrets.json`:
+3. Add to `config.json`:
    ```json
    "llm": {
+     "enabled": true,
      "api_key": "not-needed",
      "base_url": "http://localhost:11434/v1",
      "model": "llama3.2"
@@ -176,7 +160,7 @@ Using Ollama:
 
 #### Disable LLM Summarization
 
-Set `enabled: false` in `config.yaml` under the `llm` section to use traditional preview mode (first 200 characters).
+Set `"enabled": false` in `config.json` under the `llm` section to use traditional preview mode (first 200 characters).
 
 ## Local Development
 

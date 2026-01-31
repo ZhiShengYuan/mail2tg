@@ -52,21 +52,13 @@ if [ -f "bin/telegram-service" ]; then
     chmod 755 /opt/mail-to-tg/bin/telegram-service
 fi
 
-# Copy config if it doesn't exist
-if [ ! -f "/etc/mail-to-tg/config.yaml" ]; then
-    echo "Installing config..."
-    cp configs/config.production.yaml /etc/mail-to-tg/config.yaml
-    chown mail-to-tg:mail-to-tg /etc/mail-to-tg/config.yaml
-    chmod 640 /etc/mail-to-tg/config.yaml
-fi
-
-# Copy secrets.json.example if secrets.json doesn't exist
-if [ ! -f "/etc/mail-to-tg/secrets.json" ]; then
-    echo "Installing secrets.json template..."
-    cp configs/secrets.json.example /etc/mail-to-tg/secrets.json
-    chown mail-to-tg:mail-to-tg /etc/mail-to-tg/secrets.json
-    chmod 600 /etc/mail-to-tg/secrets.json
-    echo "IMPORTANT: Edit /etc/mail-to-tg/secrets.json with your credentials!"
+# Copy config.json if it doesn't exist
+if [ ! -f "/etc/mail-to-tg/config.json" ]; then
+    echo "Installing config.json template..."
+    cp configs/config.production.json.example /etc/mail-to-tg/config.json
+    chown mail-to-tg:mail-to-tg /etc/mail-to-tg/config.json
+    chmod 600 /etc/mail-to-tg/config.json
+    echo "IMPORTANT: Edit /etc/mail-to-tg/config.json with your credentials!"
 fi
 
 # Copy migrations directory
@@ -81,7 +73,7 @@ echo ""
 echo "Installation complete!"
 echo ""
 echo "Next steps:"
-echo "1. Edit /etc/mail-to-tg/secrets.json with your credentials"
+echo "1. Edit /etc/mail-to-tg/config.json with your credentials"
 echo "2. Generate encryption key: openssl rand -base64 32"
 echo "3. Set up MariaDB database (create database and user)"
 echo "4. Install systemd services: ./scripts/setup-services.sh"

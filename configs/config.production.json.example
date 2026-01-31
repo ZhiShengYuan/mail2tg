@@ -1,0 +1,61 @@
+{
+  "environment": "production",
+  "database": {
+    "host": "localhost",
+    "port": 3306,
+    "name": "mail_to_tg",
+    "user": "mail_user",
+    "password": "CHANGE_ME",
+    "max_open_conns": 50,
+    "max_idle_conns": 10
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "CHANGE_ME",
+    "db": 0
+  },
+  "mail_fetcher": {
+    "workers": 5,
+    "imap_poll_interval": 60,
+    "gmail": {
+      "project_id": "CHANGE_ME",
+      "pubsub_topic": "gmail-notifications",
+      "pubsub_subscription": "gmail-sub",
+      "credentials_path": "/etc/mail-to-tg/credentials.json"
+    }
+  },
+  "telegram": {
+    "bot_token": "CHANGE_ME",
+    "webhook_url": ""
+  },
+  "web": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "base_url": "https://your-domain.com",
+    "tls_enabled": true,
+    "tls_cert": "/etc/mail-to-tg/ssl/cert.pem",
+    "tls_key": "/etc/mail-to-tg/ssl/key.pem"
+  },
+  "security": {
+    "encryption_key": "CHANGE_ME",
+    "jwt_secret": "CHANGE_ME"
+  },
+  "storage": {
+    "attachments_path": "/var/lib/mail-to-tg/attachments"
+  },
+  "logging": {
+    "level": "info",
+    "format": "json"
+  },
+  "llm": {
+    "enabled": true,
+    "base_url": "https://api.openai.com/v1",
+    "api_key": "CHANGE_ME",
+    "model": "gpt-4o-mini",
+    "timeout_seconds": 10,
+    "max_tokens": 300,
+    "fallback_on_error": true,
+    "cache_ttl_hours": 24
+  }
+}

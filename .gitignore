@@ -15,18 +15,19 @@ bin/
 # Go workspace file
 go.work
 
-# Environment files (deprecated, use secrets.json)
+# Environment files (deprecated)
 .env
 *.env
 !.env.example
 
-# Secrets files
-secrets.json
-!secrets.json.example
+# Config files (contains secrets)
+config.json
+!config.json.example
+!config.production.json.example
 
-# Config files with secrets
+# Old YAML configs (deprecated)
 config.yaml
-!config.production.yaml
+secrets.json
 
 # Credentials
 credentials.json

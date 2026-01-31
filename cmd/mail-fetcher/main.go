@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	configPath := flag.String("config", "/etc/mail-to-tg/config.yaml", "Path to config file")
+	configPath := flag.String("config", "/etc/mail-to-tg/config.json", "Path to config file")
 	migrationsDir := flag.String("migrations", "./migrations", "Path to migrations directory")
 	flag.Parse()
 

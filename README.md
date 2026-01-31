@@ -73,12 +73,12 @@ make create-db
 # Generate encryption key
 make gen-key
 
-# Copy and edit secrets configuration
-cp configs/secrets.json.example configs/secrets.json
-nano configs/secrets.json
+# Copy and edit configuration
+cp configs/config.json.example configs/config.json
+nano configs/config.json
 ```
 
-Fill in `secrets.json`:
+Fill in `config.json`:
 - `database.password`: MariaDB password
 - `redis.password`: Redis password (if set)
 - `telegram.bot_token`: From @BotFather
@@ -87,7 +87,7 @@ Fill in `secrets.json`:
 - `gmail.project_id`: GCP project ID (if using Gmail)
 - `llm.api_key`: OpenAI API key for email summarization (optional)
 
-Application settings are in `config.yaml` (non-sensitive), secrets in `secrets.json` (sensitive).
+**Single JSON file** contains all settings and secrets.
 
 ### 4. Run Locally (Development)
 
@@ -214,11 +214,10 @@ Set `LLM_ENABLED=false` in config to disable summarization and use preview mode.
 
 ## Configuration Files
 
-- `/etc/mail-to-tg/config.yaml` - Application settings (non-sensitive)
-- `/etc/mail-to-tg/secrets.json` - Secrets (API keys, passwords)
-- `/etc/mail-to-tg/credentials.json` - Gmail OAuth credentials
+- `/etc/mail-to-tg/config.json` - **Single JSON file** with all configuration
+- `/etc/mail-to-tg/credentials.json` - Gmail OAuth credentials (if using Gmail)
 
-**Note**: Configuration uses JSON for secrets instead of environment variables. This makes it easier to manage and validate configuration.
+**Simple & Clean**: Everything in one JSON file - both settings and secrets.
 
 ## Storage
 

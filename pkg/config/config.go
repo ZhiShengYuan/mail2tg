@@ -1,121 +1,111 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
-
-	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Environment string            `yaml:"environment"`
-	Database    DatabaseConfig    `yaml:"database"`
-	Redis       RedisConfig       `yaml:"redis"`
-	MailFetcher MailFetcherConfig `yaml:"mail_fetcher"`
-	Telegram    TelegramConfig    `yaml:"telegram"`
-	Web         WebConfig         `yaml:"web"`
-	Security    SecurityConfig    `yaml:"security"`
-	Storage     StorageConfig     `yaml:"storage"`
-	Logging     LoggingConfig     `yaml:"logging"`
-	LLM         LLMConfig         `yaml:"llm"`
+	Environment string            `json:"environment"`
+	Database    DatabaseConfig    `json:"database"`
+	Redis       RedisConfig       `json:"redis"`
+	MailFetcher MailFetcherConfig `json:"mail_fetcher"`
+	Telegram    TelegramConfig    `json:"telegram"`
+	Web         WebConfig         `json:"web"`
+	Security    SecurityConfig    `json:"security"`
+	Storage     StorageConfig     `json:"storage"`
+	Logging     LoggingConfig     `json:"logging"`
+	LLM         LLMConfig         `json:"llm"`
 }
 
 type DatabaseConfig struct {
-	Host         string `yaml:"host"`
-	Port         int    `yaml:"port"`
-	Name         string `yaml:"name"`
-	User         string `yaml:"user"`
-	Password     string `yaml:"password"`
-	MaxOpenConns int    `yaml:"max_open_conns"`
-	MaxIdleConns int    `yaml:"max_idle_conns"`
+	Host         string `json:"host"`
+	Port         int    `json:"port"`
+	Name         string `json:"name"`
+	User         string `json:"user"`
+	Password     string `json:"password"`
+	MaxOpenConns int    `json:"max_open_conns"`
+	MaxIdleConns int    `json:"max_idle_conns"`
 }
 
 type RedisConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Password string `yaml:"password"`
-	DB       int    `yaml:"db"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Password string `json:"password"`
+	DB       int    `json:"db"`
 }
 
 type MailFetcherConfig struct {
-	Workers          int         `yaml:"workers"`
-	IMAPPollInterval int         `yaml:"imap_poll_interval"`
-	Gmail            GmailConfig `yaml:"gmail"`
+	Workers          int         `json:"workers"`
+	IMAPPollInterval int         `json:"imap_poll_interval"`
+	Gmail            GmailConfig `json:"gmail"`
 }
 
 type GmailConfig struct {
-	ProjectID          string `yaml:"project_id"`
-	PubSubTopic        string `yaml:"pubsub_topic"`
-	PubSubSubscription string `yaml:"pubsub_subscription"`
-	CredentialsPath    string `yaml:"credentials_path"`
+	ProjectID          string `json:"project_id"`
+	PubSubTopic        string `json:"pubsub_topic"`
+	PubSubSubscription string `json:"pubsub_subscription"`
+	CredentialsPath    string `json:"credentials_path"`
 }
 
 type TelegramConfig struct {
-	BotToken   string `yaml:"bot_token"`
-	WebhookURL string `yaml:"webhook_url"`
+	BotToken   string `json:"bot_token"`
+	WebhookURL string `json:"webhook_url"`
 }
 
 type WebConfig struct {
-	Host       string `yaml:"host"`
-	Port       int    `yaml:"port"`
-	BaseURL    string `yaml:"base_url"`
-	TLSEnabled bool   `yaml:"tls_enabled"`
-	TLSCert    string `yaml:"tls_cert"`
-	TLSKey     string `yaml:"tls_key"`
+	Host       string `json:"host"`
+	Port       int    `json:"port"`
+	BaseURL    string `json:"base_url"`
+	TLSEnabled bool   `json:"tls_enabled"`
+	TLSCert    string `json:"tls_cert"`
+	TLSKey     string `json:"tls_key"`
 }
 
 type SecurityConfig struct {
-	EncryptionKey string `yaml:"encryption_key"`
-	JWTSecret     string `yaml:"jwt_secret"`
+	EncryptionKey string `json:"encryption_key"`
+	JWTSecret     string `json:"jwt_secret"`
 }
 
 type StorageConfig struct {
-	AttachmentsPath string `yaml:"attachments_path"`
+	AttachmentsPath string `json:"attachments_path"`
 }
 
 type LoggingConfig struct {
-	Level  string `yaml:"level"`
-	Format string `yaml:"format"`
+	Level  string `json:"level"`
+	Format string `json:"format"`
 }
 
 type LLMConfig struct {
-	Enabled         bool   `yaml:"enabled"`
-	BaseURL         string `yaml:"base_url"`
-	APIKey          string `yaml:"api_key"`
-	Model           string `yaml:"model"`
-	TimeoutSeconds  int    `yaml:"timeout_seconds"`
-	MaxTokens       int    `yaml:"max_tokens"`
-	FallbackOnError bool   `yaml:"fallback_on_error"`
-	CacheTTLHours   int    `yaml:"cache_ttl_hours"`
+	Enabled         bool   `json:"enabled"`
+	BaseURL         string `json:"base_url"`
+	APIKey          string `json:"api_key"`
+	Model           string `json:"model"`
+	TimeoutSeconds  int    `json:"timeout_seconds"`
+	MaxTokens       int    `json:"max_tokens"`
+	FallbackOnError bool   `json:"fallback_on_error"`
+	CacheTTLHours   int    `json:"cache_ttl_hours"`
 }
 
 func Load(configPath string) (*Config, error) {
 	cfg := &Config{}
 
-	// Read YAML config file
-	if configPath != "" {
-		f, err := os.Open(configPath)
-		if err != nil {
-			return nil, fmt.Errorf("failed to open config file: %w", err)
-		}
-		defer f.Close()
-
-		decoder := yaml.NewDecoder(f)
-		if err := decoder.Decode(cfg); err != nil {
-			return nil, fmt.Errorf("failed to decode config: %w", err)
-		}
+	// Read JSON config file
+	if configPath == "" {
+		return nil, fmt.Errorf("config path is required")
 	}
 
-	// Load secrets from JSON file (secrets.json in same directory as config)
-	secretsPath := filepath.Join(filepath.Dir(configPath), "secrets.json")
-	secrets, err := LoadSecrets(secretsPath)
+	f, err := os.Open(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load secrets: %w", err)
+		return nil, fmt.Errorf("failed to open config file: %w", err)
 	}
+	defer f.Close()
 
-	// Apply secrets to config
-	cfg.ApplySecrets(secrets)
+	decoder := json.NewDecoder(f)
+	if err := decoder.Decode(cfg); err != nil {
+		return nil, fmt.Errorf("failed to decode config JSON: %w", err)
+	}
 
 	// Set defaults
 	if cfg.Environment == "" {

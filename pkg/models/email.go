@@ -21,11 +21,16 @@ type EmailMessage struct {
 	Attachments    *string    `db:"attachments" json:"attachments,omitempty"` // JSON array
 	InReplyTo      *string    `db:"in_reply_to" json:"in_reply_to,omitempty"`
 	References     *string    `db:"references" json:"references,omitempty"`
-	IsRead         bool       `db:"is_read" json:"is_read"`
-	IsNotified     bool       `db:"is_notified" json:"is_notified"`
-	NotifiedAt     *time.Time `db:"notified_at" json:"notified_at,omitempty"`
-	CreatedAt      time.Time  `db:"created_at" json:"created_at"`
-	UpdatedAt      time.Time  `db:"updated_at" json:"updated_at"`
+	IsRead           bool       `db:"is_read" json:"is_read"`
+	IsNotified       bool       `db:"is_notified" json:"is_notified"`
+	NotifiedAt       *time.Time `db:"notified_at" json:"notified_at,omitempty"`
+	AISummary        *string    `db:"ai_summary" json:"ai_summary,omitempty"`
+	AIExtractedData  *string    `db:"ai_extracted_data" json:"ai_extracted_data,omitempty"` // JSON object
+	AISummaryModel   *string    `db:"ai_summary_model" json:"ai_summary_model,omitempty"`
+	AISummaryAt      *time.Time `db:"ai_summary_at" json:"ai_summary_at,omitempty"`
+	AISummaryError   *string    `db:"ai_summary_error" json:"ai_summary_error,omitempty"`
+	CreatedAt        time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt        time.Time  `db:"updated_at" json:"updated_at"`
 }
 
 type EmailViewToken struct {

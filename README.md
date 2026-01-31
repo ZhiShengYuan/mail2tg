@@ -5,6 +5,7 @@ A production-ready Golang system that fetches emails from Gmail and IMAP provide
 ## Features
 
 - **Multi-Provider Support**: Gmail (via OAuth2 + Pub/Sub push) and IMAP (QQmail, etc.)
+- **AI-Powered Email Summaries**: LLM-based summarization with structured data extraction (verification codes, amounts, dates)
 - **Telegram Integration**: Real-time notifications with inline buttons
 - **HTML Email Viewing**: Secure web interface with sanitized HTML rendering
 - **Reply Functionality**: Reply to emails directly from Telegram via SMTP
@@ -81,6 +82,7 @@ Fill in:
 - `TELEGRAM_BOT_TOKEN`: From @BotFather
 - `ENCRYPTION_KEY`: From `make gen-key`
 - `GMAIL_PROJECT_ID`: GCP project ID (if using Gmail)
+- `LLM_API_KEY`: OpenAI API key for email summarization (optional)
 
 ### 4. Run Locally (Development)
 
@@ -152,11 +154,44 @@ sudo make status
 When you receive an email, you'll get a Telegram message with:
 
 - **Subject** and **Sender**
-- **Preview** (first 200 characters)
+- **AI Summary** (if LLM enabled) with extracted:
+  - Verification codes
+  - Billing amounts
+  - Due dates
+  - Tracking numbers
+  - Action items
+- **Preview** (fallback if LLM disabled, first 200 characters)
 - **Buttons**:
-  - 📧 View Full - Open HTML email in browser
+  - 🌐 View Full - Open HTML email in browser
   - ↩️ Reply - Start reply mode
   - ✅ Mark Read - Mark as read
+
+### LLM Summarization
+
+To enable AI-powered email summaries, configure an OpenAI-compatible API:
+
+**OpenAI**:
+```bash
+LLM_API_KEY=sk-your-openai-key
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_MODEL=gpt-4o-mini
+```
+
+**OpenRouter** (access multiple models):
+```bash
+LLM_API_KEY=sk-your-openrouter-key
+LLM_BASE_URL=https://openrouter.ai/api/v1
+LLM_MODEL=anthropic/claude-3.5-sonnet
+```
+
+**Local LLM** (Ollama, LM Studio, etc.):
+```bash
+LLM_API_KEY=not-needed
+LLM_BASE_URL=http://localhost:11434/v1
+LLM_MODEL=llama3.2
+```
+
+Set `LLM_ENABLED=false` in config to disable summarization and use preview mode.
 
 ## Replying to Emails
 
@@ -268,6 +303,7 @@ mail-to-tg/
 ├── pkg/                   # Public libraries
 │   ├── config/            # Configuration
 │   ├── crypto/            # Encryption
+│   ├── llm/               # LLM client for email summarization
 │   ├── logger/            # Logging
 │   └── models/            # Data models
 ├── migrations/            # Database migrations

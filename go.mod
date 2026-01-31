@@ -14,6 +14,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/microcosm-cc/bluemonday v1.0.26
 	github.com/rs/zerolog v1.31.0
+	github.com/sashabaranov/go-openai v1.41.2
 	github.com/wneessen/go-mail v0.4.1
 	golang.org/x/oauth2 v0.15.0
 	google.golang.org/api v0.155.0

@@ -5,12 +5,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/kexi/mail-to-tg/internal/bot"
 	"github.com/kexi/mail-to-tg/internal/notifier"
 	"github.com/kexi/mail-to-tg/internal/storage"
 	"github.com/kexi/mail-to-tg/internal/web"
 	"github.com/kexi/mail-to-tg/pkg/config"
+	"github.com/kexi/mail-to-tg/pkg/llm"
 	"github.com/kexi/mail-to-tg/pkg/logger"
 	"github.com/rs/zerolog/log"
 )
@@ -58,8 +60,35 @@ func main() {
 
 	log.Info().Msg("Telegram bot initialized")
 
+	// Initialize LLM client if enabled
+	var llmClient llm.Client
+	if cfg.LLM.Enabled {
+		llmClient, err = llm.NewOpenAIClient(&cfg.LLM)
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to initialize LLM client, will use fallback")
+			llmClient = nil
+		} else {
+			log.Info().
+				Str("model", cfg.LLM.Model).
+				Str("base_url", cfg.LLM.BaseURL).
+				Msg("LLM client initialized")
+		}
+	} else {
+		log.Info().Msg("LLM summarization disabled")
+	}
+
 	// Create notification consumer
-	consumer := notifier.NewNotificationConsumer(redis, db, telegramBot.GetBot(), cfg.Web.BaseURL)
+	llmTimeout := time.Duration(cfg.LLM.TimeoutSeconds) * time.Second
+	cacheTTL := time.Duration(cfg.LLM.CacheTTLHours) * time.Hour
+	consumer := notifier.NewNotificationConsumer(
+		redis,
+		db,
+		telegramBot.GetBot(),
+		cfg.Web.BaseURL,
+		llmClient,
+		llmTimeout,
+		cacheTTL,
+	)
 
 	// Start consumer in goroutine
 	go func() {

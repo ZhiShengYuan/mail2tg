@@ -48,6 +48,7 @@ make migrate
 # Method 2: Manual
 mysql -u mail_user -p mail_to_tg < migrations/001_initial_schema.sql
 mysql -u mail_user -p mail_to_tg < migrations/002_add_indexes.sql
+mysql -u mail_user -p mail_to_tg < migrations/003_add_ai_summary.sql
 ```
 
 ## Configuration
@@ -87,6 +88,11 @@ JWT_SECRET=your_random_jwt_secret
 
 # Gmail API (optional, only if using Gmail)
 GMAIL_PROJECT_ID=your-gcp-project-id
+
+# LLM API (optional, for AI-powered email summaries)
+LLM_API_KEY=sk-your-openai-api-key
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_MODEL=gpt-4o-mini
 ```
 
 ### 3. Telegram Bot Setup
@@ -119,6 +125,51 @@ If you want to support Gmail:
      --role=roles/pubsub.publisher
    ```
 7. Copy `credentials.json` to `/etc/mail-to-tg/credentials.json` (after installation)
+
+### 5. LLM Setup (Optional)
+
+To enable AI-powered email summarization, configure an OpenAI-compatible API:
+
+#### Option 1: OpenAI
+
+1. Sign up at [OpenAI Platform](https://platform.openai.com/)
+2. Create an API key
+3. Add to `.env`:
+   ```env
+   LLM_API_KEY=sk-your-openai-api-key
+   LLM_BASE_URL=https://api.openai.com/v1
+   LLM_MODEL=gpt-4o-mini
+   ```
+
+**Cost**: ~$0.27/day for 1000 emails (with gpt-4o-mini)
+
+#### Option 2: OpenRouter (Multiple Models)
+
+1. Sign up at [OpenRouter](https://openrouter.ai/)
+2. Get API key
+3. Add to `.env`:
+   ```env
+   LLM_API_KEY=sk-or-your-openrouter-key
+   LLM_BASE_URL=https://openrouter.ai/api/v1
+   LLM_MODEL=anthropic/claude-3.5-sonnet
+   ```
+
+#### Option 3: Local LLM (Privacy-Focused)
+
+Using Ollama:
+
+1. Install Ollama: `curl -fsSL https://ollama.com/install.sh | sh`
+2. Download model: `ollama pull llama3.2`
+3. Add to `.env`:
+   ```env
+   LLM_API_KEY=not-needed
+   LLM_BASE_URL=http://localhost:11434/v1
+   LLM_MODEL=llama3.2
+   ```
+
+#### Disable LLM Summarization
+
+Set `enabled: false` in `config.yaml` under the `llm` section to use traditional preview mode (first 200 characters).
 
 ## Local Development
 

@@ -1,10 +1,12 @@
 package notifier
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
 	"strings"
 
+	"github.com/kexi/mail-to-tg/pkg/llm"
 	"github.com/kexi/mail-to-tg/pkg/models"
 	"gopkg.in/telebot.v3"
 )
@@ -20,11 +22,11 @@ func NewFormatter(baseURL string) *Formatter {
 func (f *Formatter) FormatEmailNotification(email *models.EmailMessage) (string, *telebot.ReplyMarkup) {
 	var message strings.Builder
 
-	message.WriteString("<b>New Email</b>\n\n")
+	message.WriteString("<b>📧 New Email</b>\n\n")
 
 	// From
 	if email.FromName != nil && *email.FromName != "" {
-		message.WriteString(fmt.Sprintf("<b>From:</b> %s <%s>\n",
+		message.WriteString(fmt.Sprintf("<b>From:</b> %s &lt;%s&gt;\n",
 			html.EscapeString(*email.FromName),
 			html.EscapeString(email.FromAddress)))
 	} else {
@@ -40,11 +42,59 @@ func (f *Formatter) FormatEmailNotification(email *models.EmailMessage) (string,
 	message.WriteString(fmt.Sprintf("<b>Subject:</b> %s\n\n",
 		html.EscapeString(subject)))
 
-	// Preview (first 200 chars)
-	preview := f.getEmailPreview(email)
-	if preview != "" {
-		message.WriteString(preview)
+	// AI Summary (or fallback to preview)
+	if email.AISummary != nil && *email.AISummary != "" {
+		message.WriteString("<b>🤖 Summary:</b>\n")
+		message.WriteString(html.EscapeString(*email.AISummary))
 		message.WriteString("\n\n")
+
+		// Show extracted verification codes prominently
+		if email.AIExtractedData != nil {
+			var extractedData map[string]interface{}
+			if err := json.Unmarshal([]byte(*email.AIExtractedData), &extractedData); err == nil {
+				codes := llm.GetStringSlice(extractedData, "verification_codes")
+				amounts := llm.GetStringSlice(extractedData, "amounts")
+				dueDates := llm.GetStringSlice(extractedData, "due_dates")
+				trackingNums := llm.GetStringSlice(extractedData, "tracking_numbers")
+
+				// Verification codes
+				if len(codes) > 0 {
+					message.WriteString(fmt.Sprintf("<b>🔑 Code:</b> <code>%s</code>\n\n",
+						html.EscapeString(codes[0])))
+				}
+
+				// Amounts
+				if len(amounts) > 0 {
+					message.WriteString(fmt.Sprintf("<b>💰 Amount:</b> %s\n",
+						html.EscapeString(amounts[0])))
+				}
+
+				// Due dates
+				if len(dueDates) > 0 {
+					message.WriteString(fmt.Sprintf("<b>📅 Due:</b> %s\n",
+						html.EscapeString(dueDates[0])))
+				}
+
+				// Tracking numbers
+				if len(trackingNums) > 0 {
+					message.WriteString(fmt.Sprintf("<b>📦 Tracking:</b> <code>%s</code>\n",
+						html.EscapeString(trackingNums[0])))
+				}
+
+				// Add newline if we showed any extracted data
+				if len(codes) > 0 || len(amounts) > 0 || len(dueDates) > 0 || len(trackingNums) > 0 {
+					message.WriteString("\n")
+				}
+			}
+		}
+	} else {
+		// Fallback to preview if no summary
+		message.WriteString("<b>Preview:</b>\n")
+		preview := f.getEmailPreview(email)
+		if preview != "" {
+			message.WriteString(preview)
+			message.WriteString("\n\n")
+		}
 	}
 
 	// Attachments
@@ -55,7 +105,7 @@ func (f *Formatter) FormatEmailNotification(email *models.EmailMessage) (string,
 	// Inline keyboard
 	keyboard := &telebot.ReplyMarkup{}
 
-	btnView := keyboard.Data("📧 View Full", "view_"+email.ID)
+	btnView := keyboard.Data("🌐 View Full", "view_"+email.ID)
 	btnReply := keyboard.Data("↩️ Reply", "reply_"+email.ID)
 	btnMarkRead := keyboard.Data("✅ Mark Read", "mark_read_"+email.ID)
 

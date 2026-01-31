@@ -18,6 +18,7 @@ type Config struct {
 	Security    SecurityConfig  `yaml:"security"`
 	Storage     StorageConfig   `yaml:"storage"`
 	Logging     LoggingConfig   `yaml:"logging"`
+	LLM         LLMConfig       `yaml:"llm"`
 }
 
 type DatabaseConfig struct {
@@ -78,6 +79,17 @@ type LoggingConfig struct {
 	Format string `yaml:"format" envconfig:"LOG_FORMAT"`
 }
 
+type LLMConfig struct {
+	Enabled         bool   `yaml:"enabled" envconfig:"LLM_ENABLED"`
+	BaseURL         string `yaml:"base_url" envconfig:"LLM_BASE_URL"`
+	APIKey          string `yaml:"api_key" envconfig:"LLM_API_KEY"`
+	Model           string `yaml:"model" envconfig:"LLM_MODEL"`
+	TimeoutSeconds  int    `yaml:"timeout_seconds" envconfig:"LLM_TIMEOUT_SECONDS"`
+	MaxTokens       int    `yaml:"max_tokens" envconfig:"LLM_MAX_TOKENS"`
+	FallbackOnError bool   `yaml:"fallback_on_error" envconfig:"LLM_FALLBACK_ON_ERROR"`
+	CacheTTLHours   int    `yaml:"cache_ttl_hours" envconfig:"LLM_CACHE_TTL_HOURS"`
+}
+
 func Load(configPath string) (*Config, error) {
 	cfg := &Config{}
 
@@ -127,6 +139,21 @@ func Load(configPath string) (*Config, error) {
 	}
 	if cfg.Web.Port == 0 {
 		cfg.Web.Port = 8080
+	}
+	if cfg.LLM.TimeoutSeconds == 0 {
+		cfg.LLM.TimeoutSeconds = 10
+	}
+	if cfg.LLM.MaxTokens == 0 {
+		cfg.LLM.MaxTokens = 300
+	}
+	if cfg.LLM.CacheTTLHours == 0 {
+		cfg.LLM.CacheTTLHours = 24
+	}
+	if cfg.LLM.Model == "" {
+		cfg.LLM.Model = "gpt-4o-mini"
+	}
+	if cfg.LLM.BaseURL == "" {
+		cfg.LLM.BaseURL = "https://api.openai.com/v1"
 	}
 
 	return cfg, nil

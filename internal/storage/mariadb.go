@@ -204,6 +204,19 @@ func (m *MariaDB) MarkEmailAsNotified(id string) error {
 	return err
 }
 
+func (m *MariaDB) UpdateEmailSummary(emailID string, summary *string, extractedData *string, model *string, summaryError *string) error {
+	query := `UPDATE email_messages SET
+		ai_summary = ?,
+		ai_extracted_data = ?,
+		ai_summary_model = ?,
+		ai_summary_at = IF(? IS NULL, NULL, NOW()),
+		ai_summary_error = ?,
+		updated_at = NOW()
+		WHERE id = ?`
+	_, err := m.db.Exec(query, summary, extractedData, model, summary, summaryError, emailID)
+	return err
+}
+
 // Email view token operations
 func (m *MariaDB) CreateEmailViewToken(token *models.EmailViewToken) error {
 	query := `INSERT INTO email_view_tokens (id, email_id, token, expires_at)

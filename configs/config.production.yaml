@@ -1,0 +1,48 @@
+environment: production
+
+database:
+  host: localhost
+  port: 3306
+  name: mail_to_tg
+  user: mail_user
+  password: ${DB_PASSWORD}
+  max_open_conns: 50
+  max_idle_conns: 10
+
+redis:
+  host: localhost
+  port: 6379
+  password: ${REDIS_PASSWORD}
+  db: 0
+
+mail_fetcher:
+  workers: 5
+  imap_poll_interval: 60
+  gmail:
+    project_id: ${GMAIL_PROJECT_ID}
+    pubsub_topic: gmail-notifications
+    pubsub_subscription: gmail-sub
+    credentials_path: /etc/mail-to-tg/credentials.json
+
+telegram:
+  bot_token: ${TELEGRAM_BOT_TOKEN}
+  webhook_url: ${TELEGRAM_WEBHOOK_URL}
+
+web:
+  host: 0.0.0.0
+  port: 8080
+  base_url: https://your-domain.com
+  tls_enabled: true
+  tls_cert: /etc/mail-to-tg/ssl/cert.pem
+  tls_key: /etc/mail-to-tg/ssl/key.pem
+
+security:
+  encryption_key: ${ENCRYPTION_KEY}
+  jwt_secret: ${JWT_SECRET}
+
+storage:
+  attachments_path: /var/lib/mail-to-tg/attachments
+
+logging:
+  level: info
+  format: json

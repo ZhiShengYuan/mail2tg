@@ -1,0 +1,27 @@
+[Unit]
+Description=Mail to Telegram - Mail Fetcher Service
+After=network.target mariadb.service redis.service
+Wants=mariadb.service redis.service
+
+[Service]
+Type=simple
+User=mail-to-tg
+Group=mail-to-tg
+WorkingDirectory=/opt/mail-to-tg
+EnvironmentFile=/etc/mail-to-tg/.env
+ExecStart=/opt/mail-to-tg/bin/mail-fetcher -config /etc/mail-to-tg/config.yaml
+Restart=on-failure
+RestartSec=10s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mail-fetcher
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/mail-to-tg
+
+[Install]
+WantedBy=multi-user.target
